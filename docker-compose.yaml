@@ -1,0 +1,21 @@
+services:
+  attacked-vuln:
+    container_name: attacked-vuln
+    image: branyoe010/bathworld-app-prod:dos_vuln
+    env_file:
+      - .env.prod
+    ports:
+      - "${PORT}:${PORT}"
+  attacker:
+    container_name: attacker
+    build:
+      context: .
+      dockerfile: dockerfile.attacker
+    mem_limit: 2000m
+    mem_reservation: 512M
+    cpus: 2.5
+    environment:
+      DOCUMENT_ROOT: html
+    tty: true    
+    volumes:
+      - ./attacker-files/:/var/www/html/files/
