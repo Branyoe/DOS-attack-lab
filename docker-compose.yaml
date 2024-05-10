@@ -1,13 +1,30 @@
 services:
+  # ---[Conatiners Attacked]---
   attacked-vuln:
     container_name: attacked-vuln
-    image: branyoe010/bathworld-app-prod:dos_vuln
+    image: branyoe010/bathworld-app-prod
     env_file:
       - .env.prod
     ports:
-      - "${PORT}:${PORT}"
-  attacker:
-    container_name: attacker
+      - "${ATTACKED_VULN_PORT}:${ATTACKED_VULN_PORT}"
+    environment:
+      - SERVER_SECURITY="FALSE"
+      - PORT=${ATTACKED_VULN_PORT}
+
+  attacked-secure:
+    container_name: attacked-secure
+    image: branyoe010/bathworld-app-prod
+    env_file:
+      - .env.prod
+    ports:
+      - "${ATTACKED_SECURE_PORT}:${ATTACKED_SECURE_PORT}"
+    environment:
+      - SERVER_SECURITY="TRUE"
+      - PORT=${ATTACKED_SECURE_PORT}
+
+  # ---[Attacking containers]---
+  attacker-1:
+    container_name: attacker-1
     build:
       context: .
       dockerfile: dockerfile.attacker
@@ -18,4 +35,19 @@ services:
       DOCUMENT_ROOT: html
     tty: true    
     volumes:
-      - ./attacker-files/:/var/www/html/files/
+      - ./attacker-files-1/:/var/www/html/files/
+
+  # You can add more attackers
+  # attacker-n:
+  #   container_name: attacker-n
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfile.attacker
+  #   mem_limit: 2000m
+  #   mem_reservation: 512M
+  #   cpus: 2.5
+  #   environment:
+  #     DOCUMENT_ROOT: html
+  #   tty: true    
+  #   volumes:
+  #     - ./attacker-files-1/:/var/www/html/files/
